@@ -3,47 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Date & Time Display</title>
+    <title>Compact Time Display</title>
     <style>
-        body {
+        /* 核心修复开始 */
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden !important; /* 强制隐藏滚动条 */
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             background: transparent;
+            transform-origin: 0 0;  /* 为缩放做准备 */
         }
 
         #clock {
             color: #000000;
-            font-size: calc(3vw + 12px);
             font-family: 'Courier New', monospace;
             font-weight: 700;
-            padding: 10px;
+            padding: 5px;
             white-space: nowrap;
+            
+            /* 动态字体缩放系统 */
+            font-size: calc(1.5vw + 1.5vh + 8px); 
+            line-height: 1.2;  /* 紧凑行高 */
+            
+            /* 最大尺寸约束 */
+            max-width: 95%;
+            max-height: 95%;
+            box-sizing: border-box;
+            
+            /* 防溢出保护 */
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
+        /* 响应式间距系统 */
         .date-segment {
-            margin-right: 15px;
+            margin-right: min(1.5vw, 8px);
         }
 
         .time-segment {
             display: inline-block;
-            min-width: 1.2em;
+            min-width: 0.7em;  /* 更小的最小宽度 */
             text-align: center;
+            margin: 0 -0.5px;  /* 优化紧凑间距 */
         }
 
         .colon {
-            margin: 0 1px;
+            margin: 0 0.1px;
+            position: relative;
+            left: -0.5px;
         }
 
-        @media (max-width: 600px) {
+        /* 极端尺寸保护 */
+        @media (max-width: 300px) {
             #clock {
-                font-size: calc(4vw + 10px);
-            }
-            .date-segment {
-                margin-right: 8px;
+                transform: scale(0.8);
+                transform-origin: center;
             }
         }
     </style>
@@ -52,31 +75,43 @@
     <div id="clock"></div>
 
     <script>
+        // 动态字体补偿算法
+        function adjustLayout() {
+            const clock = document.getElementById('clock');
+            const container = clock.parentElement;
+            
+            // 当内容超出时自动缩放
+            if (clock.scrollWidth > container.offsetWidth) {
+                const scale = Math.min(
+                    0.95,
+                    container.offsetWidth / clock.scrollWidth
+                );
+                clock.style.transform = `scaleX(${scale})`;
+            } else {
+                clock.style.transform = '';
+            }
+        }
+
         function updateClock() {
             const now = new Date();
             
-            // 格式化日期
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const day = now.getDate().toString().padStart(2, '0');
-            
-            // 格式化时间
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-
+            // 日期时间生成...
             document.getElementById('clock').innerHTML = `
-                <span class="date-segment">${year}-${month}-${day}</span>
-                <span class="time-segment">${hours}</span>
+                <span class="date-segment">${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}</span>
+                <span class="time-segment">${now.getHours().toString().padStart(2,'0')}</span>
                 <span class="colon">:</span>
-                <span class="time-segment">${minutes}</span>
+                <span class="time-segment">${now.getMinutes().toString().padStart(2,'0')}</span>
                 <span class="colon">:</span>
-                <span class="time-segment">${seconds}</span>
+                <span class="time-segment">${now.getSeconds().toString().padStart(2,'0')}</span>
             `;
+            
+            adjustLayout(); // 每次更新时检查布局
         }
 
+        // 初始化
         updateClock();
         setInterval(updateClock, 1000);
+        window.addEventListener('resize', adjustLayout);
     </script>
 </body>
 </html>
