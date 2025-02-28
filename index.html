@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date & Time Display</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: transparent;
+        }
+
+        #clock {
+            color: #000000;
+            font-size: calc(3vw + 12px);
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            padding: 10px;
+            white-space: nowrap;
+        }
+
+        .date-segment {
+            margin-right: 15px;
+        }
+
+        .time-segment {
+            display: inline-block;
+            min-width: 1.2em;
+            text-align: center;
+        }
+
+        .colon {
+            margin: 0 1px;
+        }
+
+        @media (max-width: 600px) {
+            #clock {
+                font-size: calc(4vw + 10px);
+            }
+            .date-segment {
+                margin-right: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="clock"></div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            
+            // 格式化日期
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            
+            // 格式化时间
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+
+            document.getElementById('clock').innerHTML = `
+                <span class="date-segment">${year}-${month}-${day}</span>
+                <span class="time-segment">${hours}</span>
+                <span class="colon">:</span>
+                <span class="time-segment">${minutes}</span>
+                <span class="colon">:</span>
+                <span class="time-segment">${seconds}</span>
+            `;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
